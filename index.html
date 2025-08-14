@@ -6,39 +6,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <!-- 載入bootstrap5 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/css/bootstrap-grid.min.css"
-        integrity="sha512-79vX0oXpL1ee3k+V7jJxmmT+xdb7UrE7Fce5RYu3/l1oO/EWaMGEjDDObLXe2JSrDZtoRntVv0Iolv6i4TDWKw=="
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/css/bootstrap.min.css"
+        integrity="sha512-fw7f+TcMjTb7bpbLJZlP8g2Y4XcCyFZW8uy8HsRZsH/SwbMw0plKHFHr99DN3l04VsYNwvzicUX/6qurvIxbxw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <div class="field">
-        <div>
-            縣市名稱
-        </div>
-        <div class="location">
-        </div>
-    </div>
+    <style>
+        .wheatherbox {
+            width: 95px;
+            height: 80px;
+            margin: auto;
+            display: flex;
+        }
+    </style>
 </head>
 
 <body>
+    <div class="header mt-3">
+        <div class="row">
+            <div class="col ms-5">
+                <h1>縣市天氣預報</h1>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col">
+                <!-- 選擇哪一個縣市 -->
+                <select class="form-select form-select-lg mb-3 locationName" aria-label=".form-select-lg example">
+                    <option selected>選擇縣市</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <!-- 當前縣市 整體小卡 -->
+    <div class="container">
+        <div class="row">
+            <!-- 今日白天 -->
+            <div class="col-4">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">今日白天</h5>
+                        <div class="wheatherbox">
+                            <img src="" class="card-img-top wheatherImg" alt="">
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item degree"></li>
+                        <li class="list-group-item ciData"></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- 今晚明晨 -->
+            <div class="col-4">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">今晚明晨</h5>
+                        <div class="wheatherbox">
+                            <img src="" class="card-img-top wheatherImg" alt="">
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item degree"></li>
+                        <li class="list-group-item ciData"></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- 明日白天 -->
+            <div class="col-4">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">明日白天</h5>
+                        <div class="wheatherbox">
+                            <img src="" class="card-img-top wheatherImg" alt="">
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush ">
+                        <li class="list-group-item degree"></li>
+                        <li class="list-group-item ciData"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- 載入jquery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
         integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- 載入bootstrap5 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/js/bootstrap.min.js"
-        integrity="sha512-zKeerWHHuP3ar7kX2WKBSENzb+GJytFSBL6HrR2nPSR1kOX1qjm+oHooQtbDpDBSITgyl7QXZApvDfDWvKjkUw=="
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/js/bootstrap.bundle.min.js"
+        integrity="sha512-Tc0i+vRogmX4NN7tuLbQfBxa8JkfUSAxSFVzmU31nVdHyiHElPPy2cWfFacmCJKw0VqovrzKhdd2TSTMdAxp2g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- 載入我的api token -->
     <script src="./api/token.js"></script>
     <script>
-        
+
         $(document).ready(function () {
             // bind
             // 命名拿到的token
             let tokenpw = token;
             let url = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=${tokenpw}`;
-            // 存放縣市名稱的box
-            const location = $(".location");
-            
+            let tmpText = '';
+            // class ciData體感狀態位置
+            const ciData = $(".ciData");
+            // class degree溫度位置
+            const degree = $(".degree");
+            // class wheatherImg當天天氣狀況圖片 
+            const wheatherImg = $(".wheatherImg")
+            //縣市名稱class 
+            const locationName = $('.locationName');
+            // 全域變數 data:各縣市全部溫度資料
+            var data = '';
+
             // action
             $.ajax({
                 type: "get",
@@ -46,17 +123,74 @@
                 datatype: "json",
                 success: function (response) {
                     console.log('res', response);
-                    // 撈出record 內 的縣市名稱及縣市氣象資料
-                    let data = response.records.location;
-                    $.each(data,function (key, value) {
-                        console.log('id', key);
-                        console.log('location', value);
+                    // record內的縣市名稱及縣市氣象資料
+                    // 儲存各縣市資料
+                    data = response.records.location;
+                    // console.log("溫度體感狀態", ciData);
+                    // 直接先填入第一個選擇，避免undefined畫面
+                    $.each(data, function (key, value) {
+                        locationName.append(`<option value="${key}">${value.locationName}</option>`);
+                    });
 
-                    }) 
-                    
+                    // 預設選第一個縣市
+                    locationName.val(0).trigger("change");
                 }
             })
 
+            // 我要確定我是選擇哪一個縣市
+            locationName.on("change", function () {
+                // 縣市索引
+                let selectedId = $(this).val();
+                // 儲存運用哪張圖片
+                let imgValue = [
+                    data[selectedId].weatherElement[0].time[0].parameter.parameterValue,
+                    data[selectedId].weatherElement[0].time[1].parameter.parameterValue,
+                    data[selectedId].weatherElement[0].time[2].parameter.parameterValue,
+                ];
+                // console.log(data[selectedId].weatherElement[0].time[2].parameter.parameterValue);
+                // 放入對應的天氣預報img
+                $(".wheatherImg").each(function (index) {
+                    let val = imgValue[index];
+                    if (index == 1) {
+                        $(this).attr("src", `./night/${val}.svg`);
+                    } else {
+                        $(this).attr("src", `./day/${val}.svg`);
+                    }
+                });
+                // deGreeArrL:儲存三個時段最小溫度狀態
+                let deGreeArrL = [
+                    data[selectedId].weatherElement[2].time[0].parameter.parameterName,
+                    data[selectedId].weatherElement[2].time[1].parameter.parameterName,
+                    data[selectedId].weatherElement[2].time[2].parameter.parameterName,
+                ];
+                // deGreeArrH:儲存三個時段最小溫度狀態
+                let deGreeArrH = [
+                    data[selectedId].weatherElement[4].time[0].parameter.parameterName,
+                    data[selectedId].weatherElement[4].time[1].parameter.parameterName,
+                    data[selectedId].weatherElement[4].time[2].parameter.parameterName,
+                ];
+                // :三個時段大小溫度狀態放入溫度狀態class
+                degree.each(function (index) {
+                    $(this).text(`溫度：${deGreeArrL[index]} ~ ${deGreeArrH[index]} ℃`);
+                    // console.log(ciDataArr[index]);
+                })
+
+                // ciDataArr:儲存三個時段體感狀態
+                let ciDataArr = [
+                    data[selectedId].weatherElement[3].time[0].parameter.parameterName,
+                    data[selectedId].weatherElement[3].time[1].parameter.parameterName,
+                    data[selectedId].weatherElement[3].time[2].parameter.parameterName,
+                ];
+                // :三個時段體感狀態放入體感狀態class
+                ciData.each(function (index) {
+                    $(this).text(`體感：${ciDataArr[index]}`);
+                    // console.log(ciDataArr[index]);
+                })
+                // 確認有無抓到數據
+                // console.log("selectedId", selectedId);
+
+
+            })
         })
     </script>
 </body>
